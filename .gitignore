@@ -3,6 +3,8 @@
 *.pyc
 media/
 main_app/migrations/*
+SECRET_KEY=YourSecretKeyHere
+DEBUG=True
 !main_app/migrations/0001_initial.py
 db.sqlite3
 

@@ -511,24 +511,27 @@ def get_admin_attendance(request):
     subject_id = request.POST.get('subject')
     session_id = request.POST.get('session')
     attendance_date_id = request.POST.get('attendance_date_id')
+    end_date_id = request.POST.get('end_date_id')
     try:
         subject = get_object_or_404(Subject, id=subject_id)
         session = get_object_or_404(Session, id=session_id)
-        attendance = get_object_or_404(
-            Attendance, id=attendance_date_id, session=session)
+        attendance_start = get_object_or_404(Attendance, id=attendance_date_id, session=session)
+        attendance_end = get_object_or_404(Attendance, id=end_date_id, session=session)
         attendance_reports = AttendanceReport.objects.filter(
-            attendance=attendance)
+            attendance__date__range=[attendance_start.date, attendance_end.date],
+            attendance__subject=subject
+        )
         json_data = []
         for report in attendance_reports:
             data = {
                 "status":  str(report.status),
-                "name": str(report.student)
+                "name": str(report.student),
+                "date": str(report.attendance.date)
             }
             json_data.append(data)
         return JsonResponse(json.dumps(json_data), safe=False)
     except Exception as e:
         return None
-
 
 def admin_view_profile(request):
     admin = get_object_or_404(Admin, admin=request.user)
